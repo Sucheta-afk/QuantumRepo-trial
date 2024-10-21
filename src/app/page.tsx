@@ -8,15 +8,14 @@ export default function Home() {
     <main className="bg-gradient-to-b from-[#0b0d10] to-black min-h-screen text-white">
       {/* Header Section */}
       <section className="py-20 text-center">
-        <h1 className="text-6xl font-extrabold leading-tight">
+        <h1 className="text-6xl font-extrabold leading-tight max-w-4xl mx-auto">
           QuantumRepo: <br />
           <span className="text-purple-400">
             The upgrade GitHub could only dream about!
           </span>
         </h1>
         <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto">
-          Optimized for productivity ✨. Reimagined for industry-scale
-          collaboration.
+          Optimized for productivity ✨. Built for collaboration. Recognized for its robust security features. Welcome to the platform that developers can’t get enough of.
         </p>
 
         <div className="mt-8 flex justify-center gap-4">
@@ -34,8 +33,8 @@ export default function Home() {
       {/* Code Example Section */}
       <section className="py-16 px-8 bg-gray-900">
       <div className="text-center">
-        <h2 className="text-4xl font-semibold mb-8 text-white">
-          Supercharge high-quality software development.
+        <h2 className="text-4xl font-semibold mb-8 text-white max-w-7xl mx-auto">
+        <span className="text-green-400">Supercharge high-quality software development.</span> Our platform fuels innovation with tools that enhance developer speed, including a top-notch text editor that streamlines your coding experience.
         </h2>
       </div>
 
