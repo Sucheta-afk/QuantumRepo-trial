@@ -1,101 +1,104 @@
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <main className="bg-gradient-to-b from-[#0b0d10] to-black min-h-screen text-white">
+      {/* Header Section */}
+      <section className="py-20 text-center">
+        <h1 className="text-6xl font-extrabold leading-tight">
+          QuantumRepo: <br />
+          <span className="text-purple-400">
+            The upgrade GitHub could only dream about!
+          </span>
+        </h1>
+        <p className="mt-6 text-lg text-gray-400 max-w-2xl mx-auto">
+          Optimized for productivity ✨. Reimagined for industry-scale
+          collaboration.
+        </p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        <div className="mt-8 flex justify-center gap-4">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="px-4 py-2 rounded-md bg-gray-800 text-white focus:outline-none w-72"
+          />
+          <Button className="px-6 py-2 bg-purple-600 hover:bg-purple-700">
+            Sign Up
+          </Button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </section>
+
+      {/* Code Example Section */}
+      <section className="py-16 px-8 bg-gray-900">
+        <div className="text-center">
+          <h2 className="text-4xl font-semibold mb-8">
+            Supercharge high-quality software development.
+          </h2>
+        </div>
+
+        <div className="flex justify-center">
+          <div className="bg-gray-800 p-6 rounded-md w-full max-w-3xl">
+            <pre className="text-left text-white">
+              {`// Sample Code
+function QuantumRepo() {
+  console.log("Welcome to QuantumRepo!");
+}`}
+            </pre>
+          </div>
+        </div>
+
+        <p className="text-center text-green-400 mt-6 text-2xl">
+          22% increase in developer productivity 🛠️
+        </p>
+      </section>
+
+      {/* Collaboration Section */}
+      <section className="py-16 px-8">
+        <h2 className="text-4xl font-semibold text-center mb-8">
+          Supercharge collaboration.
+        </h2>
+        <div className="overflow-auto">
+          <table className="w-full table-auto border-collapse border border-gray-700">
+            <thead>
+              <tr className="bg-gray-800">
+                <th className="border border-gray-700 px-4 py-2">Project</th>
+                <th className="border border-gray-700 px-4 py-2">Owner</th>
+                <th className="border border-gray-700 px-4 py-2">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-700 px-4 py-2">
+                  QuantumRepo Backend
+                </td>
+                <td className="border border-gray-700 px-4 py-2">Alice</td>
+                <td className="border border-gray-700 px-4 py-2">
+                  In Progress
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-700 px-4 py-2">UI Revamp</td>
+                <td className="border border-gray-700 px-4 py-2">Bob</td>
+                <td className="border border-gray-700 px-4 py-2">Completed</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p className="text-center text-green-400 mt-6 text-2xl">
+          80% reduction in review time ⏲️
+        </p>
+      </section>
+
+      {/* Footer Section */}
+      <footer className="py-12 text-center bg-gray-900">
+        <h3 className="text-3xl font-semibold">
+          56 million projects... and counting 🚀
+        </h3>
+        <Button className="mt-6 px-8 py-3 bg-purple-600 hover:bg-purple-700">
+          Explore Now
+        </Button>
       </footer>
-    </div>
+    </main>
   );
 }
