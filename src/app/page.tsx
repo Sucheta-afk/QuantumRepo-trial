@@ -1,4 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { atomOneDark, solarizedDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { okaidia, solarizedDarkAtom, solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 export default function Home() {
   return (
@@ -30,27 +33,42 @@ export default function Home() {
 
       {/* Code Example Section */}
       <section className="py-16 px-8 bg-gray-900">
-        <div className="text-center">
-          <h2 className="text-4xl font-semibold mb-8">
-            Supercharge high-quality software development.
-          </h2>
-        </div>
+      <div className="text-center">
+        <h2 className="text-4xl font-semibold mb-8 text-white">
+          Supercharge high-quality software development.
+        </h2>
+      </div>
 
-        <div className="flex justify-center">
-          <div className="bg-gray-800 p-6 rounded-md w-full max-w-3xl">
-            <pre className="text-left text-white">
-              {`// Sample Code
-function QuantumRepo() {
-  console.log("Welcome to QuantumRepo!");
-}`}
-            </pre>
-          </div>
-        </div>
+      <div className="flex justify-center">
+        <div className="bg-gray-800 p-6 rounded-md w-full max-w-3xl">
+          <SyntaxHighlighter language="jsx" style={okaidia}>
+            {`// Sample Code for Counter Component
+import React, { useState } from 'react';
 
-        <p className="text-center text-green-400 mt-6 text-2xl">
-          22% increase in developer productivity 🛠️
-        </p>
-      </section>
+const Counter = () => {
+  const [count, setCount] = useState(0);
+
+  const increment = () => setCount(count + 1);
+  const decrement = () => setCount(count - 1);
+
+  return (
+    <div>
+      <h2>Count: {count}</h2>
+      <button onClick={increment}>Increment</button>
+      <button onClick={decrement}>Decrement</button>
+    </div>
+  );
+};
+
+export default Counter;`}
+          </SyntaxHighlighter>
+        </div>
+      </div>
+
+      <p className="text-center text-green-400 mt-6 text-2xl">
+        22% increase in developer productivity 🛠️
+      </p>
+    </section>
 
       {/* Collaboration Section */}
       <section className="py-16 px-8">
