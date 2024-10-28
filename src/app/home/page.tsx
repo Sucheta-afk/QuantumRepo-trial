@@ -2,11 +2,11 @@
 'use client'; // Add this at the top to indicate a Client Component
 
 import { useEffect, useState } from 'react';
-import Header from '@/components/Header';
-import HeroSection from '@/components/Hero';
-import FeaturesSection from '@/components/Features';
-import StatsSection from '@/components/Stats';
-import Footer from '@/components/Footer';
+import Header from '@/components/home/Header';
+import HeroSection from '@/components/home/Hero';
+import FeaturesSection from '@/components/home/Features';
+import StatsSection from '@/components/home/Stats';
+import Footer from '@/components/home/Footer';
 
 const sections = [
   { id: 'hero', accentColor: 'bg-green-500' },
