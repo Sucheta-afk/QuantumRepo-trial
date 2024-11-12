@@ -1,5 +1,5 @@
 // src/app/home/page.tsx
-'use client'; // Add this at the top to indicate a Client Component
+"use client"; 
 
 import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
@@ -30,7 +30,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-gray-900 text-white">
+    <div className="home-background relative min-h-screen text-white">
       {/* Vertical Animated Line */}
       <div
         className={`absolute top-0 left-0 h-full w-[4px] transition-all duration-300 ${sections[activeSection]?.accentColor}`}

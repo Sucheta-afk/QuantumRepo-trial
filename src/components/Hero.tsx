@@ -17,10 +17,10 @@ const HeroSection = () => {
           Where the world builds software
         </h1>
         <p className="text-xl text-gray-200 mt-6">
-          Millions of developers and companies build, ship, and maintain their software on GitHub—the largest and most advanced development platform in the world.
+          Millions of developers and companies build, ship, and maintain their software on QuantumRepo on one of the most advanced development platform in the world.
         </p>
         <a href="/signup" className="inline-block mt-8 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
-          Sign Up for GitHub
+          Sign Up for QuantumRepo
         </a>
       </div>
     </section>

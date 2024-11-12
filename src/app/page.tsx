@@ -1,4 +1,3 @@
-// src/app/page.tsx
 import HomeWrapper from './home/HomeWrapper';
 import HomePage from './home/page';
 
