@@ -13,7 +13,7 @@ const features = [
   },
   {
     title: "Version Control",
-    description: "Track every change to your code with Git version control.",
+    description: "Track every change to your code with Repo version control.",
     icon: FaCodeBranch,
   },
 ];
@@ -22,7 +22,7 @@ const FeaturesSection = () => {
   return (
     <section className="py-20">
       <div className="container mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-12">GitHub Features</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-12">QuantumRepo Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <div key={index} className="bg-gray-800 p-8 rounded-lg shadow-lg">
