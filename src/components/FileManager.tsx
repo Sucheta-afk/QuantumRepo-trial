@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import Modal from 'react-modal';
 import { File } from '@/lib/types';
-import { useDrag, useDrop } from 'react-dnd';
+import { FaFile, FaFolder, FaJs, FaCss3Alt, FaHtml5, FaPython, FaReact, FaFolderOpen  } from 'react-icons/fa';
 
 interface FileManagerProps {
   repoName: string;
@@ -13,12 +14,14 @@ interface FileManagerProps {
 const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect, onFileCreate, onFileMove }) => {
   const [isFolderOpen, setIsFolderOpen] = useState<{ [key: string]: boolean }>({});
   const [allFiles, setAllFiles] = useState<File[]>(files);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newFileName, setNewFileName] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState('root');
 
   const toggleFolder = (folderName: string) => {
     setIsFolderOpen((prev) => ({ ...prev, [folderName]: !prev[folderName] }));
   };
 
-  // Group files by folders
   const groupedFiles = allFiles.reduce<{ [key: string]: File[] }>((acc, file) => {
     const parts = file.name.split('/');
     const folder = parts.length > 1 ? parts[0] : '';
@@ -39,39 +42,64 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
     return acc;
   }, {});
 
-  // File and Folder creation
   const createNewFile = () => {
-    const fileName = prompt('Enter the new file name:');
-    if (fileName) {
-      const newFile = { name: fileName, content: '' };
+    setIsModalOpen(true);
+  };
+
+  const handleFileCreate = () => {
+    if (newFileName.trim()) {
+      const newFile = { name: `${selectedFolder}/${newFileName}`, content: '' };
       setAllFiles((prev) => [...prev, newFile]);
       onFileCreate(newFile);
+      setIsModalOpen(false);
+      setNewFileName('');
+      setSelectedFolder('root');
     }
   };
 
-  const createNewFolder = () => {
-    const folderName = prompt('Enter the new folder name:');
-    if (folderName) {
-      setAllFiles((prev) => [...prev, { name: `${folderName}/newFile.js`, content: '' }]);
+  const handleFolderSelect = (folder: string) => {
+    setSelectedFolder(folder);
+  };
+
+  const getFileIcon = (fileName: string) => {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    switch (ext) {
+      case 'js':
+        return <FaJs />;
+      case 'css':
+        return <FaCss3Alt />;
+      case 'html':
+        return <FaHtml5 />;
+      case 'py':
+        return <FaPython />;
+      case 'jsx':
+      case 'ts':
+      case 'tsx':
+        return <FaReact />;
+      default:
+        return <FaFile />;
     }
   };
 
   return (
     <div className="w-64 h-full bg-gray-800 text-white p-4 overflow-y-auto">
-      {/* Repository Name */}
       <h3 className="text-lg font-semibold mb-4">{repoName}</h3>
 
-      {/* Create Buttons */}
       <div className="mb-4">
-        <button onClick={createNewFolder} className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded mb-2 w-full">
-          + Create Folder
-        </button>
-        <button onClick={createNewFile} className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded w-full">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded mb-2 w-full"
+        >
           + Create File
+        </button>
+        <button
+          onClick={() => handleFolderSelect('root')}
+          className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded w-full"
+        >
+          + Create Folder
         </button>
       </div>
 
-      {/* File Structure */}
       <ul className="space-y-2">
         {Object.keys(groupedFiles).map((folder) => (
           <li key={folder}>
@@ -79,9 +107,7 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
               onClick={() => toggleFolder(folder)}
               className="flex items-center cursor-pointer"
             >
-              <span className="mr-2">
-                {isFolderOpen[folder] ? '📂' : '📁'}
-              </span>
+              <span className="mr-2">{isFolderOpen[folder] ? <FaFolderOpen /> : <FaFolder />}</span>
               {folder}
             </div>
             {isFolderOpen[folder] && (
@@ -92,7 +118,10 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
                     onClick={() => onFileSelect({ name: `${folder}/${file.name}`, content: file.content })}
                     className="cursor-pointer hover:bg-gray-500 px-2 rounded"
                   >
-                    {file.name}
+                    <div className="flex items-center space-x-2">
+                      {getFileIcon(file.name)}
+                      <span>{file.name}</span>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -100,6 +129,56 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
           </li>
         ))}
       </ul>
+
+      {/* Dark Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        className="bg-gray-900 p-6 rounded-lg max-w-md mx-auto"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+      >
+        <h2 className="text-xl font-semibold text-white mb-4">Create New File</h2>
+        <div className="mb-4">
+          <label className="block text-sm text-white mb-2">File Name:</label>
+          <input
+            type="text"
+            value={newFileName}
+            onChange={(e) => setNewFileName(e.target.value)}
+            className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg"
+            placeholder="Enter file name"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm text-white mb-2">Select Folder:</label>
+          <select
+            value={selectedFolder}
+            onChange={(e) => handleFolderSelect(e.target.value)}
+            className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-lg"
+          >
+            {Object.keys(groupedFiles).map((folder) => (
+              <option key={folder} value={folder}>
+                {folder}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex justify-end space-x-4">
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="bg-gray-600 hover:bg-gray-700 text-white py-1 px-4 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleFileCreate}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-4 rounded"
+          >
+            Create
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };
