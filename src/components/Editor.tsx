@@ -1,5 +1,5 @@
-import React from 'react';
-import MonacoEditor, { OnChange, EditorProps } from '@monaco-editor/react';
+import React, { useEffect, useState } from 'react';
+import MonacoEditor, { OnChange } from '@monaco-editor/react';
 
 interface CodeEditorProps {
   language?: string;
@@ -9,6 +9,29 @@ interface CodeEditorProps {
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ language = 'javascript', theme = 'vs-dark', value, onChange }) => {
+  const [editor, setEditor] = useState<any>(null);
+  const [originalValue] = useState(value);
+
+  // Track changes and update decorations for modified lines
+  const handleEditorChange: OnChange = (newValue) => {
+    onChange(newValue);
+
+    if (editor && newValue !== undefined) {
+      const changes = editor.getModel().getValue() !== originalValue;
+      editor.deltaDecorations(
+        [],
+        changes
+          ? [
+              {
+                range: editor.getModel().getFullModelRange(),
+                options: { inlineClassName: 'modified-line' },
+              },
+            ]
+          : []
+      );
+    }
+  };
+
   return (
     <div style={{ height: '90vh', width: '100%' }}>
       <MonacoEditor
@@ -16,12 +39,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ language = 'javascript', theme 
         language={language}
         value={value}
         theme={theme}
-        onChange={(newValue) => onChange(newValue)}
+        onChange={handleEditorChange}
         options={{
           fontSize: 14,
           wordWrap: 'on',
           minimap: { enabled: false },
         }}
+        onMount={(editorInstance) => setEditor(editorInstance)}
       />
     </div>
   );

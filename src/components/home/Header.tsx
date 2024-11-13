@@ -1,13 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
+
+  useEffect(() => {
+    // This should check if the user is logged in (e.g., by checking a token in localStorage or cookie)
+    const token = localStorage.getItem("authToken"); // Example check
+    setIsLoggedIn(!!token);
+  }, []);
 
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
+  };
+
+  const handleLogout = () => {
+    // Logic for logging out (e.g., clearing token, redirecting, etc.)
+    localStorage.removeItem("authToken");
+    setIsLoggedIn(false); // Update state
   };
 
   return (
@@ -50,18 +63,37 @@ const Header = () => {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex space-x-4">
-          <Link
-            href="/auth/login"
-            className="text-green-500 border border-green-500 px-4 py-2 rounded hover:bg-green-500 hover:text-white transition"
-          >
-            Login
-          </Link>
-          <Link
-            href="/auth/register"
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-          >
-            Sign Up
-          </Link>
+          {isLoggedIn ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="text-green-500 border border-green-500 px-4 py-2 rounded hover:bg-green-500 hover:text-white transition"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="text-white border border-red-500 px-4 py-2 rounded hover:bg-red-500 transition"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                className="text-green-500 border border-green-500 px-4 py-2 rounded hover:bg-green-500 hover:text-white transition"
+              >
+                Login
+              </Link>
+              <Link
+                href="/auth/register"
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
@@ -90,20 +122,43 @@ const Header = () => {
             >
               Pricing
             </Link>
-            <Link
-              href="/login"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-              onClick={toggleMenu}
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-              onClick={toggleMenu}
-            >
-              Sign Up
-            </Link>
+            {isLoggedIn ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                  onClick={toggleMenu}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    toggleMenu();
+                  }}
+                  className="text-white px-4 py-2 rounded hover:bg-red-500 transition"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                  onClick={toggleMenu}
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+                  onClick={toggleMenu}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       )}
