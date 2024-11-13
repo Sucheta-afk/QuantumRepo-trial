@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 import RepositoryCard from '@/components/dashboard/RepositoryCard';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
@@ -22,6 +23,11 @@ export default function Repositories() {
 
   const [showModal, setShowModal] = useState(false);
   const [newRepo, setNewRepo] = useState<Repository>({ id: 0, name: '', description: '', language: '', updatedAt: '' });
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const handleSidebarToggle = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,12 +47,17 @@ export default function Repositories() {
   return (
     <div className="flex min-h-screen bg-gray-900 text-white">
       {/* Sidebar */}
-      <Sidebar/>
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleSidebarToggle} />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      {/* Main Content Area */}
+      <div
+        className={`flex-1 flex flex-col transition-all duration-300 ${
+          isSidebarOpen ? 'ml-16 md:ml-64' : 'ml-20'
+        }`}
+      >
         {/* Header */}
         <Header />
+
         {/* Button to Open Modal */}
         <button
           onClick={() => setShowModal(true)}
@@ -56,10 +67,12 @@ export default function Repositories() {
         </button>
 
         {/* Repository List */}
-        <main className="flex-1 p-10 bg-gray-900">
+        <main className={`flex-1 p-6 lg:p-10 bg-gray-900 transition-all duration-300`}>
           <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
             {repositories.map((repo) => (
-              <RepositoryCard key={repo.id} repo={repo} />
+              <Link key={repo.id} href={`/dashboard/${repo.id}`}>
+                <RepositoryCard repo={repo} />
+              </Link>
             ))}
           </div>
         </main>

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 
 export const metadata: Metadata = {
   title: "Quantum Repo",
-  description: "",
+  description: "Login to Quantum Repo",
 };
 
 export default function RootLayout({
