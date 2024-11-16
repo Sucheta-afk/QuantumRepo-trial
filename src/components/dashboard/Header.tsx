@@ -1,13 +1,40 @@
 import Image from "next/image";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa";
+import axios from "axios";
+import useCheckAuth from "@/utils/checkAuth";
+import { auth } from "@/utils/firebase"; 
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+
+  const router = useRouter();
+
+  const API_URL = typeof window !== "undefined" ? window.location.origin : "";
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isSearchOpen, setSearchOpen] = useState(false);
-
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const { user, isAuthenticated } = useCheckAuth(); // Using custom hook for auth
+
+  // Fetch profile image
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      if (user) {
+        try {
+          const response = await axios.get(`${API_URL}/api/user/profile-img?firebaseUid=${user.uid}`);
+          setProfileImage(response.data.avatarUrl);
+        } catch (error) {
+          console.error("Error fetching profile image:", error);
+        }
+      }
+    };
+
+    fetchProfileImage();
+  }, [user, API_URL]);
 
   // Toggle profile dropdown
   const handleProfileClick = () => {
@@ -16,8 +43,9 @@ export default function Header() {
 
   // Handle logout action
   const handleLogout = () => {
-    // Add logic to logout the user (e.g., clear session, redirect, etc.)
-    console.log("Logging out...");
+    auth.signOut().then(() => {
+      router.push("/")
+    });
   };
 
   // Toggle search bar on mobile
@@ -35,9 +63,14 @@ export default function Header() {
         setDropdownOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  if (!isAuthenticated) {
+    return null; // Ensure header doesn't render if the user isn't authenticated
+  }
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
@@ -69,14 +102,23 @@ export default function Header() {
 
       {/* Profile Icon and Dropdown */}
       <div className="relative">
-        <Image
-          src="/assets/profile-icon.jpg"
-          alt="User Avatar"
-          width={40}
-          height={40}
-          className="rounded-full cursor-pointer"
-          onClick={handleProfileClick}
-        />
+        {profileImage ? (
+          <Image
+            src={profileImage}
+            alt="User Avatar"
+            width={40}
+            height={40}
+            className="rounded-full cursor-pointer"
+            onClick={handleProfileClick}
+          />
+        ) : (
+          <div
+            className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center text-gray-400 cursor-pointer"
+            onClick={handleProfileClick}
+          >
+            ?
+          </div>
+        )}
         {isDropdownOpen && (
           <div
             className="absolute right-0 mt-2 w-40 bg-gray-700 border border-gray-600 rounded-md shadow-lg z-10"

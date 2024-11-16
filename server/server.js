@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
 import cors from "cors";
 import connectDB from "./config/db.js";
-import { auth } from "./utils/firebase.js";
+import userRoutes from "./routes/userRoutes.js"
 
 dotenv.config();
 
@@ -30,8 +30,9 @@ app.prepare().then(() => {
   // Middleware to parse JSON
   server.use(express.json());
 
-  // Define your custom routes before the Next.js catch-all
   server.use("/auth", authRoutes);
+  server.use("/api", userRoutes);
+
 
   // Catch-all route for Next.js pages
   server.all("*", (req, res) => {

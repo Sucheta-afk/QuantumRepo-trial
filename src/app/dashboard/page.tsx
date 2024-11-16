@@ -1,34 +1,63 @@
 "use client";
 
-import Sidebar from '@/components/dashboard/Sidebar';
-import Header from '@/components/dashboard/Header';
-import { useState } from 'react';
+import Sidebar from "@/components/dashboard/Sidebar";
+import Header from "@/components/dashboard/Header";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import useCheckAuth from "@/utils/checkAuth";
 
 export default function Dashboard() {
+  const API_URL = typeof window !== "undefined" ? window.location.origin : "";
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [userData, setUserData] = useState<any>(null);
+  const { user, isAuthenticated, loading } = useCheckAuth();
 
   const handleSidebarToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user) {
+        try {
+          const response = await axios.get(`${API_URL}/api/user?firebaseUid=${user.uid}`);
+          setUserData(response.data);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return null; 
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-white relative">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={handleSidebarToggle} />
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <div
         className={`flex-1 flex flex-col transition-all duration-300 ${
-          isSidebarOpen ? 'ml-16 md:ml-64' : 'ml-20'
+          isSidebarOpen ? "ml-16 md:ml-64" : "ml-20"
         }`}
       >
         {/* Header */}
         <Header />
 
-        {/* Main Dashboard Content */}
+        {/* Dashboard Content */}
         <main
           className={`flex-1 p-6 lg:p-10 bg-gray-900 transition-all duration-300 ${
-            isSidebarOpen ? 'md:pl-16' : 'md:pl-10'
+            isSidebarOpen ? "md:pl-16" : "md:pl-10"
           }`}
         >
           <h1 className="text-3xl font-semibold mb-6">Welcome to your Dashboard</h1>
@@ -65,6 +94,17 @@ export default function Dashboard() {
               <button className="mt-4 text-blue-500 hover:text-blue-400">Manage Repos</button>
             </div>
           </div>
+
+          {/* User Data Section */}
+          {userData && (
+            <div className="mt-8 p-6 bg-gray-800 rounded-xl shadow-md">
+              <h2 className="text-2xl font-bold">Your Data</h2>
+              <p className="text-gray-400">Username: {userData.username}</p>
+              <p className="text-gray-400">Email: {userData.email}</p>
+              <p className="text-gray-400">Repositories: {userData.repositories?.length}</p>
+              <p className="text-gray-400">Activity: {userData.activity?.length}</p>
+            </div>
+          )}
         </main>
       </div>
     </div>

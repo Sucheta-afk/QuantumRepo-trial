@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
-import { auth } from "../../../server/utils/firebase";
+import { auth } from "@/utils/firebase"; 
 import { onAuthStateChanged } from "firebase/auth";
 
 const Header = () => {
