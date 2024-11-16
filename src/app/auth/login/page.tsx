@@ -1,36 +1,36 @@
 "use client";
 
-import React, { useState, FormEvent } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import Footer from '@/components/auth/Footer';
+import React, { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import Footer from "@/components/auth/Footer";
+import { googleLogin, githubLogin } from "@/app/api/auth/route";
+import { useRouter } from "next/navigation";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 
 const SignIn: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-
+  // Handle Google Sign-In
+  const handleGoogleSignIn = async () => {
     try {
-      const response = await fetch('/api/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: username, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert(data.message);
-      } else {
-        alert(data.message);
-      }
+      const data = await googleLogin();
+      router.push("/");
     } catch (error) {
-      console.error('An error occurred:', error);
-      alert('An error occurred. Please try again.');
+      console.error("An error occurred during Google Sign-In:", error);
+      setError("An error occurred during Google Sign-In. Please try again.");
+    }
+  };
+
+  // Handle GitHub Sign-In
+  const handleGitHubSignIn = async () => {
+    try {
+      const data = await githubLogin();
+      router.push("/");
+    } catch (error) {
+      console.error("An error occurred during GitHub Sign-In:", error);
+      setError("An error occurred during GitHub Sign-In. Please try again.");
     }
   };
 
@@ -38,7 +38,13 @@ const SignIn: React.FC = () => {
     <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
       {/* Logo */}
       <div className="logo mb-4">
-        <Image src="/assets/logo.jpg" alt="QuantumRepo Logo" className="w-40 h-40 rounded-full" width={160} height={160}/>
+        <Image
+          src="/assets/logo.jpg"
+          alt="QuantumRepo Logo"
+          className="w-40 h-40 rounded-full"
+          width={160}
+          height={160}
+        />
       </div>
 
       {/* Header */}
@@ -46,57 +52,46 @@ const SignIn: React.FC = () => {
 
       {/* Container */}
       <div className="container max-w-xs w-full p-6 bg-gray-700 rounded-lg shadow-lg">
-        {/* Form */}
-        <form onSubmit={handleSubmit}>
-          {/* Username Input */}
-          <div className="input-group mb-4">
-            <label className="label text-sm font-semibold mb-1" htmlFor="username">
-              Username or email address
-            </label>
-            <input
-              type="text"
-              id="username"
-              className="input w-full px-3 py-2 rounded border border-gray-500 bg-gray-800 text-white"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
+        {/* Error Message */}
+        {error && (
+          <p className="text-red-500 mb-4 text-sm text-center">{error}</p>
+        )}
 
-          {/* Password Input */}
-          <div className="input-group mb-4">
-            <label className="label text-sm font-semibold mb-1" htmlFor="password">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="input w-full px-3 py-2 rounded border border-gray-500 bg-gray-800 text-white"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <Link href="/auth/forgot-password" className="text-blue-500 text-xs hover:underline mt-1 block">
-              Forgot password?
-            </Link>
-          </div>
+        {/* Google Sign-In Button */}
+        <button
+          onClick={handleGoogleSignIn}
+          className="button w-full px-3 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 mb-4 flex items-center justify-center"
+        >
+          <FaGoogle className="mr-2" />
+          Sign in with Google
+        </button>
 
-          {/* Sign In Button */}
-          <button type="submit" className="button w-full px-3 py-2 bg-green-600 text-white rounded font-semibold hover:bg-green-700">
-            Sign in
-          </button>
-        </form>
+        {/* GitHub Sign-In Button */}
+        <button
+          onClick={handleGitHubSignIn}
+          className="button w-full px-3 py-2 bg-gray-800 text-white rounded font-semibold hover:bg-gray-700 mb-4 flex items-center justify-center"
+        >
+          <FaGithub className="mr-2" />
+          Sign in with GitHub
+        </button>
 
         {/* Footer Links */}
         <div className="footer-links mt-4 text-center text-sm">
           <p>
-            New to QuantumRepo? <Link href="/auth/register" className="text-blue-500 hover:underline">Create an account</Link>.
+            New to QuantumRepo?{" "}
+            <Link
+              href="/auth/register"
+              className="text-blue-500 hover:underline"
+            >
+              Create an account
+            </Link>
+            .<br />
           </p>
         </div>
       </div>
 
       {/* Footer */}
-      <Footer/>
+      <Footer />
     </div>
   );
 };
