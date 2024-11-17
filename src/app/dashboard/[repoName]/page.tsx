@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { FaStar, FaCodeBranch, FaExclamationCircle, FaPlay, FaTrash } from "react-icons/fa";
+import {
+  FaStar,
+  FaCodeBranch,
+  FaExclamationCircle,
+  FaPlay,
+  FaTrash,
+} from "react-icons/fa";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import axios from "axios";
@@ -27,9 +33,9 @@ type Repository = {
   files: File[];
 };
 
-export default function RepositoryDetails() {
-  const API_URL = typeof window !== "undefined" ? window.location.origin : "";
+const API_URL = typeof window !== "undefined" ? window.location.origin : "";
 
+export default function RepositoryDetails() {
   const params = useParams();
   const repoName = params.repoName;
   const [repo, setRepo] = useState<Repository | null>(null);
@@ -110,13 +116,17 @@ export default function RepositoryDetails() {
           <div className="bg-gray-800 p-6 rounded-lg shadow-md mb-6">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl font-semibold text-blue-400">{repo.name}</h1>
+                <h1 className="text-3xl font-semibold text-blue-400">
+                  {repo.name}
+                </h1>
                 <p className="text-gray-400 mt-1">{repo.description}</p>
                 <div className="flex items-center space-x-4 mt-3">
                   <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
                     {repo.language}
                   </span>
-                  <span className="text-sm text-gray-500">Updated {repo.updatedAt}</span>
+                  <span className="text-sm text-gray-500">
+                    Updated {repo.updatedAt}
+                  </span>
                 </div>
               </div>
             </div>
@@ -165,12 +175,21 @@ export default function RepositoryDetails() {
             <h2 className="text-2xl font-semibold text-blue-400 mb-4">Files</h2>
             <div className="space-y-4">
               {repo.files.length === 0 ? (
-                <p className="text-gray-400">No files found in this repository.</p>
+                <p className="text-gray-400">
+                  No files found in this repository.
+                </p>
               ) : (
                 repo.files.map((file) => (
-                  <div key={file._id} className="bg-gray-800 p-4 rounded-lg shadow-md">
-                    <h3 className="text-xl font-semibold text-blue-500">{file.name}</h3>
-                    <p className="text-gray-400 mt-2">{file.content.substring(0, 10)}...</p>
+                  <div
+                    key={file._id}
+                    className="bg-gray-800 p-4 rounded-lg shadow-md"
+                  >
+                    <h3 className="text-xl font-semibold text-blue-500">
+                      {file.name}
+                    </h3>
+                    <p className="text-gray-400 mt-2">
+                      {file.content.substring(0, 10)}...
+                    </p>
                   </div>
                 ))
               )}
@@ -182,9 +201,12 @@ export default function RepositoryDetails() {
         {isModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-96">
-              <h3 className="text-xl text-red-600 font-semibold mb-4">Are you sure?</h3>
+              <h3 className="text-xl text-red-600 font-semibold mb-4">
+                Are you sure?
+              </h3>
               <p className="text-gray-400 mb-4">
-                This action cannot be undone. The repository "{repoName}" will be permanently deleted.
+                This action cannot be undone. The repository &quot;{repoName}
+                &quot; will be permanently deleted.
               </p>
               <div className="flex justify-end space-x-4">
                 <button

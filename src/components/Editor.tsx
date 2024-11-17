@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import MonacoEditor, { OnChange } from '@monaco-editor/react';
+import React, { useState } from "react";
+import MonacoEditor, { OnChange } from "@monaco-editor/react";
+import * as monaco from "monaco-editor";
 
 interface CodeEditorProps {
   language?: string;
@@ -8,31 +9,40 @@ interface CodeEditorProps {
   onChange: (value: string | undefined) => void;
 }
 
-const CodeEditor: React.FC<CodeEditorProps> = ({ language = 'javascript', theme = 'vs-dark', value, onChange }) => {
-  const [editor, setEditor] = useState<any>(null);
+const CodeEditor: React.FC<CodeEditorProps> = ({
+  language = "javascript",
+  theme = "vs-dark",
+  value,
+  onChange,
+}) => {
+  const [editor, setEditor] =
+    useState<monaco.editor.IStandaloneCodeEditor | null>(null);
   const [originalValue] = useState(value);
 
   const handleEditorChange: OnChange = (newValue) => {
     onChange(newValue);
 
     if (editor && newValue !== undefined) {
-      const changes = editor.getModel().getValue() !== originalValue;
-      editor.deltaDecorations(
-        [],
-        changes
-          ? [
-              {
-                range: editor.getModel().getFullModelRange(),
-                options: { inlineClassName: 'modified-line' },
-              },
-            ]
-          : []
-      );
+      const model = editor.getModel();
+      if (model) {
+        const changes = model.getValue() !== originalValue;
+        editor.deltaDecorations(
+          [],
+          changes
+            ? [
+                {
+                  range: model.getFullModelRange(),
+                  options: { inlineClassName: "modified-line" },
+                },
+              ]
+            : []
+        );
+      }
     }
   };
 
   return (
-    <div style={{ height: '90vh', width: '100%' }}>
+    <div style={{ height: "90vh", width: "100%" }}>
       <MonacoEditor
         height="100%"
         language={language}
@@ -41,7 +51,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ language = 'javascript', theme 
         onChange={handleEditorChange}
         options={{
           fontSize: 14,
-          wordWrap: 'on',
+          wordWrap: "on",
           minimap: { enabled: false },
         }}
         onMount={(editorInstance) => setEditor(editorInstance)}

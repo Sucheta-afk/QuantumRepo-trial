@@ -7,7 +7,6 @@ import {
   FaTimes,
   FaTachometerAlt,
   FaBook,
-  FaClipboardList,
   FaCog,
 } from "react-icons/fa";
 
@@ -65,13 +64,6 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
           >
             <FaBook size={28} />
             {isOpen && <span>Repositories</span>}
-          </Link>
-          <Link
-            href="/dashboard/activity"
-            className="flex items-center space-x-4 text-gray-400 hover:text-white transition-colors justify-center"
-          >
-            <FaClipboardList size={28} />
-            {isOpen && <span>Activity</span>}
           </Link>
           <Link
             href="/dashboard/settings"

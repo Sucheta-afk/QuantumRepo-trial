@@ -8,6 +8,7 @@ import Header from "@/components/dashboard/Header";
 import checkAuth from "@/utils/checkAuth";
 import axios from "axios";
 
+// Define the Repository type
 export type Repository = {
   id: string;
   name: string;
@@ -16,9 +17,18 @@ export type Repository = {
   updatedAt: string;
 };
 
-export default function Repositories() {
-  const API_URL = typeof window !== "undefined" ? window.location.origin : "";
+// Helper type to handle errors
+interface CustomError extends Error {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
 
+const API_URL = typeof window !== "undefined" ? window.location.origin : "";
+
+export default function Repositories() {
   const [repositories, setRepositories] = useState<Repository[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -44,15 +54,15 @@ export default function Repositories() {
   };
 
   const validateRepoName = (name: string) => {
-    // Regex to allow only alphanumeric characters and hyphens
     const isValid = /^[a-zA-Z0-9-]+$/.test(name);
 
     if (!isValid) {
-      setError("Repository name can only contain letters, numbers, and hyphens.");
+      setError(
+        "Repository name can only contain letters, numbers, and hyphens."
+      );
       return false;
     }
 
-    // Check for uniqueness in the existing repositories
     const isUnique = !repositories.some((repo) => repo.name === name);
     if (!isUnique) {
       setError("Repository name must be unique.");
@@ -68,22 +78,26 @@ export default function Repositories() {
         const response = await axios.get(
           `${API_URL}/api/user/repositories?firebaseUid=${user.uid}`
         );
-        setRepositories(
-          response.data.repositories.map((repo: any) => ({
+
+        const repos: Repository[] = response.data.repositories.map(
+          (repo: Repository) => ({
             ...repo,
-            id: String(repo.id), // Ensure id is a string
-          }))
+            id: String(repo.id),
+          })
         );
+
+        setRepositories(repos);
       }
     } catch (error) {
+      const typedError = error as CustomError;
       console.error("Error fetching repositories:", error);
+      setError(typedError.message || "Error fetching repositories");
     }
   };
 
   const handleAddRepo = async () => {
     const { name, description, language } = newRepo;
 
-    // Validation
     if (!name || !description || !language) {
       setError("All fields are required.");
       return;
@@ -103,10 +117,9 @@ export default function Repositories() {
           }
         );
 
-        // Append the newly created repository to the list
         setRepositories((prev) => [
           ...prev,
-          { ...response.data, id: String(response.data.id) }, // Ensure id is a string
+          { ...response.data, id: String(response.data.id) },
         ]);
         setShowModal(false);
         setNewRepo({ name: "", description: "", language: "" });
@@ -122,7 +135,7 @@ export default function Repositories() {
     if (user) {
       fetchRepositories();
     }
-  }, [user]);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;

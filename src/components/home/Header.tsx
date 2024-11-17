@@ -8,16 +8,13 @@ import { onAuthStateChanged } from "firebase/auth";
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setIsLoggedIn(true);
-        setUser(firebaseUser);
       } else {
         setIsLoggedIn(false);
-        setUser(null);
       }
     });
 
@@ -31,7 +28,6 @@ const Header = () => {
   const handleLogout = () => {
     auth.signOut().then(() => {
       setIsLoggedIn(false);
-      setUser(null);
     });
   };
 

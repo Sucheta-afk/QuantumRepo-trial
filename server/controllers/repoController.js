@@ -16,7 +16,7 @@ export const getRepoDetails = async (req, res) => {
         return res.status(404).json({ message: "User not found" });
       }
   
-      const repo = user.repositories.find((repo) => repo.name === repoName);
+      const repo = Repo.find((repo) => repo.name === repoName);
   
       if (!repo) {
         return res.status(404).json({ message: "Repository not found" });

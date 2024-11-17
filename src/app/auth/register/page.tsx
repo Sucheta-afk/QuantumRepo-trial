@@ -4,9 +4,73 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
 import Footer from "@/components/auth/Footer";
-import { googleLogin, githubLogin } from "@/app/api/auth/route";
 import { useRouter } from "next/navigation";
 import { FaGoogle, FaGithub } from "react-icons/fa";
+import axios from "axios";
+import {
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup,
+  UserCredential,
+} from "firebase/auth";
+import { auth } from "@/utils/firebase";
+
+const API_URL = typeof window !== "undefined" ? window.location.origin : "";
+
+interface LoginResponse {
+  message: string;
+}
+
+// Helper type to handle errors
+interface CustomError extends Error {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
+// Google Login
+const googleLogin = async (): Promise<LoginResponse> => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const result: UserCredential = await signInWithPopup(auth, provider);
+    const token = await result.user.getIdToken();
+
+    const response = await axios.post(
+      `${API_URL}/auth/googleLogin`,
+      { token },
+      { withCredentials: true }
+    );
+
+    return response.data;
+  } catch (error) {
+    const typedError = error as CustomError;
+    console.error("Error during Google login:", typedError);
+    throw new Error(typedError.message || "Google Login failed");
+  }
+};
+
+// GitHub Login
+const githubLogin = async (): Promise<LoginResponse> => {
+  try {
+    const provider = new GithubAuthProvider();
+    const result: UserCredential = await signInWithPopup(auth, provider);
+    const token = await result.user.getIdToken();
+
+    const response = await axios.post(
+      `${API_URL}/auth/githubLogin`,
+      { token },
+      { withCredentials: true }
+    );
+
+    return response.data;
+  } catch (error) {
+    const typedError = error as CustomError;
+    console.error("Error during GitHub login:", typedError);
+    throw new Error(typedError.message || "GitHub Login failed");
+  }
+};
 
 const CreateAccount: React.FC = () => {
   const [error, setError] = useState("");
@@ -15,7 +79,7 @@ const CreateAccount: React.FC = () => {
   // Handle Google Sign-In
   const handleGoogleSignIn = async () => {
     try {
-      const data = await googleLogin();
+      await googleLogin();
       router.push("/");
     } catch (error) {
       console.error("An error occurred during Google Sign-In:", error);
@@ -26,7 +90,7 @@ const CreateAccount: React.FC = () => {
   // Handle GitHub Sign-In
   const handleGitHubSignIn = async () => {
     try {
-      const data = await githubLogin();
+      await githubLogin();
       router.push("/");
     } catch (error) {
       console.error("An error occurred during GitHub Sign-In:", error);
