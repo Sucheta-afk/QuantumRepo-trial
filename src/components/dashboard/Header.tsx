@@ -18,7 +18,7 @@ export default function Header() {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
-  const { user, isAuthenticated } = useCheckAuth(); // Using custom hook for auth
+  const { user, isAuthenticated } = useCheckAuth();
 
   // Fetch profile image
   useEffect(() => {
@@ -48,6 +48,10 @@ export default function Header() {
     });
   };
 
+  const profile = () => {
+      router.push("/dashboard/settings");
+  };
+
   // Toggle search bar on mobile
   const toggleSearch = () => {
     setSearchOpen((prev) => !prev);
@@ -69,7 +73,7 @@ export default function Header() {
   }, []);
 
   if (!isAuthenticated) {
-    return null; // Ensure header doesn't render if the user isn't authenticated
+    return null;
   }
 
   return (
@@ -126,7 +130,7 @@ export default function Header() {
           >
             <button
               className="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-600 rounded-t-md"
-              onClick={() => console.log("Profile clicked")}
+              onClick={profile}
             >
               Profile
             </button>

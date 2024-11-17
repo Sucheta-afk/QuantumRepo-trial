@@ -2,9 +2,10 @@ import express from "express";
 import next from "next";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js"
+import repoRoutes from "./routes/repoRoutes.js"
 import cors from "cors";
 import connectDB from "./config/db.js";
-import userRoutes from "./routes/userRoutes.js"
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.prepare().then(() => {
 
   server.use("/auth", authRoutes);
   server.use("/api", userRoutes);
+  server.use("/api/user", repoRoutes);
 
 
   // Catch-all route for Next.js pages
