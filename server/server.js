@@ -26,7 +26,12 @@ app.prepare().then(() => {
     cors({
       origin: "http://localhost:3000",
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    })
+    },
+    {
+      origin: "https://quantum-repo.vercel.app/",
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    }
+  )
   );
 
   // Middleware to parse JSON
