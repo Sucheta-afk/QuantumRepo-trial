@@ -14,29 +14,6 @@ if (!admin.apps.length) {
   });
 }
 
-// Find or create a user in MongoDB based on Firebase UID
-const findOrCreateUser = async (firebaseUser) => {
-  const { uid, displayName, email, photoURL } = firebaseUser;
-
-  // Try to find an existing user
-  let user = await User.findOne({ firebaseUid: uid });
-
-  // If no user exists, create a new one
-  if (!user) {
-    user = new User({
-      firebaseUid: uid,
-      username: displayName || email.split('@')[0],
-      email,
-      avatarUrl: photoURL || '',
-    });
-
-    // Save the user
-    await user.save();
-  }
-
-  return user;
-};
-
 // Login/Signup using Google Sign-In
 export const googleLoginHandler = async (req, res) => {
   try {
@@ -46,7 +23,6 @@ export const googleLoginHandler = async (req, res) => {
       return res.status(400).json({ error: "Missing token" });
     }
 
-    // Verify the ID token with Firebase Admin
     const decodedToken = await admin.auth().verifyIdToken(token);
     const { email, name, picture, uid } = decodedToken;
 
@@ -54,11 +30,9 @@ export const googleLoginHandler = async (req, res) => {
       return res.status(400).json({ error: "No email associated with Google account" });
     }
 
-    // Try to find the user in the database
     let user = await User.findOne({ email });
 
     if (user) {
-      // User exists, sign them in
       return res.status(200).json({
         message: "Google login successful",
         user: {
@@ -69,15 +43,13 @@ export const googleLoginHandler = async (req, res) => {
         },
       });
     } else {
-      // User doesn't exist, create a new user
       user = new User({
         firebaseUid: uid,
         username: name || email.split('@')[0],
         email,
         avatarUrl: picture || '',
       });
-
-      // Save the user to the database
+      
       await user.save();
 
       return res.status(200).json({
@@ -105,7 +77,6 @@ export const githubLoginHandler = async (req, res) => {
       return res.status(400).json({ error: "Missing token" });
     }
 
-    // Verify the ID token with Firebase Admin
     const decodedToken = await admin.auth().verifyIdToken(token);
     const { email, name, picture, uid } = decodedToken;
 
@@ -113,11 +84,9 @@ export const githubLoginHandler = async (req, res) => {
       return res.status(400).json({ error: "No email associated with GitHub account" });
     }
 
-    // Try to find the user in the database
     let user = await User.findOne({ email });
 
     if (user) {
-      // User exists, sign them in
       return res.status(200).json({
         message: "GitHub login successful",
         user: {
@@ -128,7 +97,6 @@ export const githubLoginHandler = async (req, res) => {
         },
       });
     } else {
-      // User doesn't exist, create a new user
       user = new User({
         firebaseUid: uid,
         username: name || email.split('@')[0],
@@ -136,7 +104,6 @@ export const githubLoginHandler = async (req, res) => {
         avatarUrl: picture || '',
       });
 
-      // Save the user to the database
       await user.save();
 
       return res.status(200).json({

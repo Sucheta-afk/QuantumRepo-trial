@@ -8,12 +8,11 @@ interface FileManagerProps {
   files: File[];
   onFileSelect: (file: File) => void;
   onFileCreate: (newFile: File) => void;
-  onFileMove: (sourceFile: File, destinationFolder: string) => void;
+  onFileDelete: (fileName: string) => void; 
 }
 
-const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect, onFileCreate, onFileMove }) => {
+const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect, onFileCreate, onFileDelete }) => {
   const [isFolderOpen, setIsFolderOpen] = useState<{ [key: string]: boolean }>({});
-  const [allFiles, setAllFiles] = useState<File[]>(files);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newFileName, setNewFileName] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('root');
@@ -22,22 +21,15 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
     setIsFolderOpen((prev) => ({ ...prev, [folderName]: !prev[folderName] }));
   };
 
-  const groupedFiles = allFiles.reduce<{ [key: string]: File[] }>((acc, file) => {
+  const groupedFiles = files.reduce<{ [key: string]: File[] }>((acc, file) => {
     const parts = file.name.split('/');
-    const folder = parts.length > 1 ? parts[0] : '';
-    const fileName = parts.length > 1 ? parts.slice(1).join('/') : parts[0];
+    const folder = parts.length > 1 ? parts[0] : 'root';
+    const fileName = parts.slice(1).join('/') || parts[0];
 
-    if (folder) {
-      if (!acc[folder]) {
-        acc[folder] = [];
-      }
-      acc[folder].push({ name: fileName, content: file.content });
-    } else {
-      if (!acc['root']) {
-        acc['root'] = [];
-      }
-      acc['root'].push(file);
+    if (!acc[folder]) {
+      acc[folder] = [];
     }
+    acc[folder].push({ name: fileName, content: file.content });
 
     return acc;
   }, {});
@@ -48,8 +40,8 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
 
   const handleFileCreate = () => {
     if (newFileName.trim()) {
-      const newFile = { name: `${selectedFolder}/${newFileName}`, content: '' };
-      setAllFiles((prev) => [...prev, newFile]);
+      const filePath = selectedFolder === 'root' ? newFileName : `${selectedFolder}/${newFileName}`;
+      const newFile = { name: filePath, content: '' };
       onFileCreate(newFile);
       setIsModalOpen(false);
       setNewFileName('');
@@ -87,16 +79,10 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
 
       <div className="mb-4">
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={createNewFile}
           className="bg-green-500 hover:bg-green-600 text-white py-1 px-2 rounded mb-2 w-full"
         >
           + Create File
-        </button>
-        <button
-          onClick={() => handleFolderSelect('root')}
-          className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded w-full"
-        >
-          + Create Folder
         </button>
       </div>
 
@@ -121,6 +107,12 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
                     <div className="flex items-center space-x-2">
                       {getFileIcon(file.name)}
                       <span>{file.name}</span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onFileDelete(`${folder}/${file.name}`); }}
+                        className="ml-2 text-red-500"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </li>
                 ))}
@@ -130,7 +122,6 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
         ))}
       </ul>
 
-      {/* Dark Modal */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}

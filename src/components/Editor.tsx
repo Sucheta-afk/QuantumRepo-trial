@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import MonacoEditor, { OnChange } from '@monaco-editor/react';
 
 interface CodeEditorProps {
@@ -12,7 +12,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ language = 'javascript', theme 
   const [editor, setEditor] = useState<any>(null);
   const [originalValue] = useState(value);
 
-  // Track changes and update decorations for modified lines
   const handleEditorChange: OnChange = (newValue) => {
     onChange(newValue);
 

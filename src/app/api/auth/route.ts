@@ -2,13 +2,10 @@ import axios, { AxiosResponse } from "axios";
 import { auth } from "@/utils/firebase";
 import { GoogleAuthProvider, GithubAuthProvider, signInWithPopup, UserCredential } from "firebase/auth";
 
-// Define the API URL based on the environment
 const API_URL = typeof window !== "undefined" ? window.location.origin : "";
 
-// Define the response data type (adjust this based on your API response structure)
 interface LoginResponse {
   message: string;
-  // Add other fields as per your response structure
 }
 
 // Google Login

@@ -6,7 +6,7 @@ const router = express.Router();
 // Google Login Route
 router.post('/googleLogin', googleLoginHandler);
 
-// GitHub Login Route (New)
+// GitHub Login Route
 router.post('/githubLogin', githubLoginHandler);
 
 export default router;

@@ -35,11 +35,10 @@ export default function RepositoryDetails() {
   const [repo, setRepo] = useState<Repository | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-  const [deleting, setDeleting] = useState(false); // State for delete button loading state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
-  // Custom hook for authentication
   const { user, loading: authLoading, isAuthenticated } = useCheckAuth();
 
   const handleLaunchEditor = () => {
@@ -54,12 +53,12 @@ export default function RepositoryDetails() {
     try {
       setDeleting(true);
       await axios.delete(`${API_URL}/api/user/${user.uid}/repo/${repoName}`);
-      router.push("/dashboard"); // Redirect to the dashboard after deletion
+      router.push("/dashboard");
     } catch (error) {
       console.error("Error deleting repository:", error);
     } finally {
       setDeleting(false);
-      setIsModalOpen(false); // Close the modal after the deletion process
+      setIsModalOpen(false);
     }
   };
 
@@ -153,7 +152,7 @@ export default function RepositoryDetails() {
             <div className="mt-6">
               <button
                 className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg shadow-lg flex items-center space-x-2"
-                onClick={() => setIsModalOpen(true)} // Open the confirmation modal
+                onClick={() => setIsModalOpen(true)}
               >
                 <FaTrash />
                 <span>Delete Repository</span>
@@ -171,13 +170,7 @@ export default function RepositoryDetails() {
                 repo.files.map((file) => (
                   <div key={file._id} className="bg-gray-800 p-4 rounded-lg shadow-md">
                     <h3 className="text-xl font-semibold text-blue-500">{file.name}</h3>
-                    <p className="text-gray-400 mt-2">{file.content.substring(0, 100)}...</p>
-                    <a
-                      href={`/dashboard/${repoName}/file/${file._id}`}
-                      className="text-blue-500 hover:text-blue-700 mt-2 inline-block"
-                    >
-                      View Full File
-                    </a>
+                    <p className="text-gray-400 mt-2">{file.content.substring(0, 10)}...</p>
                   </div>
                 ))
               )}
@@ -196,14 +189,14 @@ export default function RepositoryDetails() {
               <div className="flex justify-end space-x-4">
                 <button
                   className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg"
-                  onClick={() => setIsModalOpen(false)} // Close the modal
+                  onClick={() => setIsModalOpen(false)}
                 >
                   Cancel
                 </button>
                 <button
                   className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-                  onClick={handleDeleteRepo} // Proceed with deletion
-                  disabled={deleting} // Disable button while deleting
+                  onClick={handleDeleteRepo}
+                  disabled={deleting}
                 >
                   {deleting ? "Deleting..." : "Delete"}
                 </button>

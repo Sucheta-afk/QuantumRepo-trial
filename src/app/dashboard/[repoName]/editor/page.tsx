@@ -1,34 +1,45 @@
-"use client"; // Ensure this is a client-side component
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { FaSave, FaCloudUploadAlt } from 'react-icons/fa';
-import Modal from 'react-modal';
-import CodeEditor from '@/components/Editor';
-import FileManager from '@/components/FileManager';
-import TopBar from '@/components/TopBar';
-import { File } from '@/lib/types';
+import { useState, useEffect, useCallback } from "react";
+import { FaSave } from "react-icons/fa";
+import CodeEditor from "@/components/Editor";
+import FileManager from "@/components/FileManager";
+import TopBar from "@/components/TopBar";
+import axios from "axios";
+import useCheckAuth from "@/utils/checkAuth";
+import { File } from "@/lib/types";
+import { useParams } from "next/navigation";
 
-const EditorPage: React.FC = () => {
-  const initialFiles: File[] = [
-    { name: 'index.js', content: '// index.js content' },
-    { name: 'App.js', content: '// App.js content' },
-    { name: 'style.css', content: '/* style.css content */' },
-    { name: 'folder1/file1.js', content: '// file1.js content' },
-    { name: 'folder1/file2.js', content: '// file2.js content' },
-    { name: 'folder2/file1.js', content: '// file1.js content' },
-    { name: 'folder2/file2.js', content: '// file2.js content' },
-  ];
+const initialFiles: File[] = [];
 
+const EditorPage = () => {
+  const params = useParams();
   const [files, setFiles] = useState<File[]>(initialFiles);
-  const [openFiles, setOpenFiles] = useState<File[]>([initialFiles[0]]);
-  const [selectedFile, setSelectedFile] = useState<File>(initialFiles[0]);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal for commit message
-  const [commitMessage, setCommitMessage] = useState(''); // State for commit message
-  const [isClient, setIsClient] = useState(false); // Check if it's client-side
+  const [openFiles, setOpenFiles] = useState<File[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const { user, loading: authLoading, isAuthenticated } = useCheckAuth();
+  const repoName = Array.isArray(params.repoName) ? params.repoName[0] : params.repoName;
 
   useEffect(() => {
-    setIsClient(true); // Mark component as client-side once mounted
-  }, []);
+    const fetchFiles = async () => {
+      try {
+        if (!authLoading && isAuthenticated && user?.uid) {
+          const response = await axios.get(`/api/repos/${user.uid}/${repoName}/files`);
+          setFiles(response.data);
+          
+          if (response.data.length > 0) {
+            const firstFile = response.data[0];
+            setSelectedFile({ ...firstFile, content: firstFile.content || "" });
+            setOpenFiles([firstFile]);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching files:", error);
+      }
+    };
+
+    fetchFiles();
+  }, [repoName, authLoading, isAuthenticated, user?.uid]);
 
   const handleFileSelect = useCallback((file: File) => {
     if (!openFiles.some((f) => f.name === file.name)) {
@@ -43,99 +54,100 @@ const EditorPage: React.FC = () => {
 
   const handleCloseTab = (file: File) => {
     setOpenFiles((prevOpenFiles) => prevOpenFiles.filter((f) => f.name !== file.name));
-    if (selectedFile.name === file.name && openFiles.length > 1) {
+    if (selectedFile?.name === file.name && openFiles.length > 1) {
       const nextFile = openFiles.find((f) => f.name !== file.name);
       if (nextFile) setSelectedFile(nextFile);
     }
   };
 
   const handleCodeChange = (newContent: string | undefined) => {
-    setSelectedFile((prevFile) => ({ ...prevFile, content: newContent || '' }));
+    if (selectedFile) {
+      setSelectedFile((prevFile) => ({
+        ...prevFile!,
+        content: newContent || "",
+      }));
+    }
   };
 
-  // Toggle commit message modal
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
+  // Handle saving individual file content
+  const handleSaveFile = async () => {
+    if (selectedFile) {
+      try {
+        const sanitizedFileName = selectedFile.name.startsWith('root/')
+          ? selectedFile.name.replace('root/', '')
+          : selectedFile.name;
+  
+        const response = await axios.patch(`/api/repos/${user.uid}/${repoName}/files/${sanitizedFileName}`, {
+          content: selectedFile.content,
+        });
+  
+        console.log("File saved:", response.data);
+      } catch (error) {
+        console.error("Error saving file:", error);
+      }
+    }
   };
 
-  // Handle publishing (placeholder for publishing logic)
-  const handlePublish = () => {
-    console.log("Publishing with commit message:", commitMessage);
-    setIsModalOpen(false);
-    setCommitMessage('');
+  // Handle adding a new file
+  const handleAddFile = async (newFile: File) => {
+    try {
+      const response = await axios.post(`/api/repos/${user.uid}/${repoName}/files`, newFile);
+      setFiles((prevFiles) => [...prevFiles, response.data]);
+    } catch (error) {
+      console.error("Error adding file:", error);
+    }
   };
+
+  // Handle deleting a file
+  const handleDeleteFile = async (fileName: string) => {
+    try {
+      const sanitizedFileName = fileName.replace(/^root\//, "");
+  
+      await axios.delete(`/api/repos/${user.uid}/${repoName}/files/${sanitizedFileName}`);
+      setFiles((prevFiles) => prevFiles.filter((f) => f.name !== sanitizedFileName));
+  
+      if (selectedFile?.name === sanitizedFileName && openFiles.length > 1) {
+        const nextFile = openFiles.find((f) => f.name !== sanitizedFileName);
+        if (nextFile) setSelectedFile(nextFile);
+      }
+    } catch (error) {
+      console.error("Error deleting file:", error);
+    }
+  };
+  
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Top Bar with Save and Publish Buttons */}
       <TopBar
         openFiles={openFiles}
-        activeFile={selectedFile}
+        activeFile={selectedFile || { name: "", content: "" }}
         onTabSelect={handleTabSelect}
         onCloseTab={handleCloseTab}
       >
-        <button onClick={() => console.log("File saved")} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+        <button onClick={handleSaveFile} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
           <FaSave className="inline mr-2" /> Save
-        </button>
-        <button onClick={toggleModal} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded ml-2">
-          <FaCloudUploadAlt className="inline mr-2" /> Publish
         </button>
       </TopBar>
 
-      {/* Main Content Area */}
       <div className="flex flex-grow">
-        {/* File Manager with drag-and-drop */}
-        <FileManager 
-          repoName="My Awesome Repo" 
-          files={files} 
-          onFileSelect={handleFileSelect} 
-          onFileCreate={(newFile) => setFiles([...files, newFile])}
-          onFileMove={(sourceFile, destinationFolder) => {
-            const updatedFiles = files.map((file) => 
-              file.name === sourceFile.name ? { ...file, name: `${destinationFolder}/${file.name.split('/').pop()}` } : file
-            );
-            setFiles(updatedFiles);
-          }}
+        <FileManager
+          repoName={repoName}
+          files={files}
+          onFileSelect={handleFileSelect}
+          onFileCreate={handleAddFile}
+          onFileDelete={handleDeleteFile}
         />
-
-        {/* Code Editor */}
         <div className="flex flex-col flex-grow">
-          <CodeEditor
-            language="javascript"
-            value={selectedFile.content}
-            onChange={handleCodeChange}
-            key={selectedFile.name}
-          />
+          {selectedFile && (
+            <CodeEditor
+              language="javascript"
+              value={selectedFile.content}
+              onChange={handleCodeChange}
+              key={selectedFile.name}
+            />
+          )}
         </div>
       </div>
-
-      {/* Commit Message Modal */}
-      {isClient && (
-        <Modal
-          isOpen={isModalOpen}
-          onRequestClose={toggleModal}
-          contentLabel="Commit Message"
-          className="modal-content"
-          overlayClassName="modal-overlay"
-        >
-          <h2 className="text-xl font-bold mb-4">Commit Message</h2>
-          <input
-            type="text"
-            placeholder="Enter commit message..."
-            value={commitMessage}
-            onChange={(e) => setCommitMessage(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
-          <div className="mt-4 flex justify-end">
-            <button onClick={toggleModal} className="mr-2 px-4 py-2 bg-gray-300 text-gray-700 rounded">
-              Cancel
-            </button>
-            <button onClick={handlePublish} className="px-4 py-2 bg-blue-500 text-white rounded">
-              Publish
-            </button>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 };
