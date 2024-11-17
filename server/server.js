@@ -24,15 +24,14 @@ app.prepare().then(() => {
   // CORS configuration
   server.use(
     cors({
-      origin: "http://localhost:3000",
+      origin: [
+        "http://localhost:3000",
+        "https://quantum-repo.vercel.app",
+      ],
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    },
-    {
-      origin: "https://quantum-repo.vercel.app/",
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    }
-  )
+    })
   );
+  
 
   // Middleware to parse JSON
   server.use(express.json());
