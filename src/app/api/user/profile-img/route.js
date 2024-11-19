@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import User from "@/models/User.js";
 
-export async function GET(req: Request) {
+export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const firebaseUid = searchParams.get("firebaseUid");
 

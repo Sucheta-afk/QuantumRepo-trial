@@ -23,17 +23,16 @@ export default function Header() {
   // Fetch profile image
   useEffect(() => {
     const fetchProfileImage = async () => {
-      if (user) {
-        try {
-          const response = await axios.get(`${API_URL}/api/user/profile-img?firebaseUid=${user.uid}`);
-          setProfileImage(response.data.avatarUrl);
-        } catch (error) {
-          console.error("Error fetching profile image:", error);
-        }
+      if (user.uid == null) return;
+      try {
+        const response = await axios.get(`${API_URL}/api/user/profile-img?firebaseUid=${user.uid}`);
+        setProfileImage(response.data.avatarUrl);
+      } catch (error) {
+        console.error("Error fetching profile image:", error);
       }
     };
   
-    fetchProfileImage();
+    if (user) fetchProfileImage();
   }, [user, API_URL]);
 
   // Toggle profile dropdown
