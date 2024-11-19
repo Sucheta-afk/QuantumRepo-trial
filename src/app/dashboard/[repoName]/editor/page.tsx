@@ -26,10 +26,13 @@ const EditorPage = () => {
         if (!authLoading && isAuthenticated && user?.uid) {
           const response = await axios.get(`/api/repos/${user.uid}/${repoName}/files`);
           setFiles(response.data);
-          
+
           if (response.data.length > 0) {
             const firstFile = response.data[0];
-            setSelectedFile({ ...firstFile, content: firstFile.content || "" });
+            setSelectedFile({
+              ...firstFile,
+              content: firstFile.content || "", // handle missing content
+            });
             setOpenFiles([firstFile]);
           }
         }
@@ -76,11 +79,11 @@ const EditorPage = () => {
         const sanitizedFileName = selectedFile.name.startsWith('root/')
           ? selectedFile.name.replace('root/', '')
           : selectedFile.name;
-  
+
         const response = await axios.patch(`/api/repos/${user.uid}/${repoName}/files/${sanitizedFileName}`, {
           content: selectedFile.content,
         });
-  
+
         console.log("File saved:", response.data);
       } catch (error) {
         console.error("Error saving file:", error);
@@ -91,7 +94,11 @@ const EditorPage = () => {
   // Handle adding a new file
   const handleAddFile = async (newFile: File) => {
     try {
-      const response = await axios.post(`/api/repos/${user.uid}/${repoName}/files`, newFile);
+      const response = await axios.post(`/api/repos/${user.uid}/${repoName}/files`, {
+        name: newFile.name, 
+        content: newFile.content || "",
+      });
+      
       setFiles((prevFiles) => [...prevFiles, response.data]);
     } catch (error) {
       console.error("Error adding file:", error);
@@ -102,10 +109,10 @@ const EditorPage = () => {
   const handleDeleteFile = async (fileName: string) => {
     try {
       const sanitizedFileName = fileName.replace(/^root\//, "");
-  
+
       await axios.delete(`/api/repos/${user.uid}/${repoName}/files/${sanitizedFileName}`);
       setFiles((prevFiles) => prevFiles.filter((f) => f.name !== sanitizedFileName));
-  
+
       if (selectedFile?.name === sanitizedFileName && openFiles.length > 1) {
         const nextFile = openFiles.find((f) => f.name !== sanitizedFileName);
         if (nextFile) setSelectedFile(nextFile);
@@ -114,7 +121,6 @@ const EditorPage = () => {
       console.error("Error deleting file:", error);
     }
   };
-  
 
   return (
     <div className="flex flex-col h-screen">
@@ -141,7 +147,7 @@ const EditorPage = () => {
           {selectedFile && (
             <CodeEditor
               language="javascript"
-              value={selectedFile.content}
+              value={selectedFile.content || ""}
               onChange={handleCodeChange}
               key={selectedFile.name}
             />

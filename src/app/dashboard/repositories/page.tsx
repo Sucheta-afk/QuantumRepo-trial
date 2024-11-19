@@ -15,6 +15,7 @@ export type Repository = {
   description: string;
   language: string;
   updatedAt: string;
+  files: { name: string; content: string }[]; // Adding file information to repository
 };
 
 // Helper type to handle errors
@@ -26,7 +27,7 @@ interface CustomError extends Error {
   };
 }
 
-const API_URL = typeof window !== "undefined" ? window.location.origin : "";
+const API_URL = "/api/repo"; // Updated API URL
 
 export default function Repositories() {
   const [repositories, setRepositories] = useState<Repository[]>([]);
@@ -72,22 +73,24 @@ export default function Repositories() {
     return true;
   };
 
+  // Fetch repositories after firebaseUid is available
   const fetchRepositories = async () => {
+    if (!user?.uid) {
+      return; // Ensure we only make the API call if firebaseUid is available
+    }
+
     try {
-      if (user) {
-        const response = await axios.get(
-          `${API_URL}/api/user/repositories?firebaseUid=${user.uid}`
-        );
+      const response = await axios.get(`${API_URL}?firebaseUid=${user.uid}`);
+      const repos: Repository[] = response.data.map((repo: Repository) => ({
+        id: String(repo.id),
+        name: repo.name,
+        description: repo.description,
+        language: repo.language || "", // Default empty language if not provided
+        updatedAt: repo.updatedAt,
+        files: repo.files || [], // Ensure files are included
+      }));
 
-        const repos: Repository[] = response.data.repositories.map(
-          (repo: Repository) => ({
-            ...repo,
-            id: String(repo.id),
-          })
-        );
-
-        setRepositories(repos);
-      }
+      setRepositories(repos);
     } catch (error) {
       const typedError = error as CustomError;
       console.error("Error fetching repositories:", error);
@@ -96,9 +99,9 @@ export default function Repositories() {
   };
 
   const handleAddRepo = async () => {
-    const { name, description, language } = newRepo;
+    const { name, description } = newRepo;
 
-    if (!name || !description || !language) {
+    if (!name || !description) {
       setError("All fields are required.");
       return;
     }
@@ -109,13 +112,10 @@ export default function Repositories() {
 
     try {
       if (user) {
-        const response = await axios.post(
-          `${API_URL}/api/user/repository/add`,
-          {
-            firebaseUid: user.uid,
-            ...newRepo,
-          }
-        );
+        const response = await axios.post(`${API_URL}`, {
+          firebaseUid: user.uid,
+          ...newRepo,
+        });
 
         setRepositories((prev) => [
           ...prev,
@@ -132,10 +132,10 @@ export default function Repositories() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user?.uid) {
       fetchRepositories();
     }
-  }, []);
+  }, [user]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -172,9 +172,11 @@ export default function Repositories() {
           {repositories.length > 0 ? (
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
               {repositories.map((repo) => (
-                <Link key={repo.id} href={`/dashboard/${repo.name}`}>
-                  <RepositoryCard repo={repo} />
-                </Link>
+                <div key={repo.id}>
+                  <Link href={`/dashboard/${repo.name}`}>
+                    <RepositoryCard repo={repo} />
+                  </Link>
+                </div>
               ))}
             </div>
           ) : (

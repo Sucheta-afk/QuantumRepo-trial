@@ -32,7 +32,7 @@ export default function Header() {
         }
       }
     };
-
+  
     fetchProfileImage();
   }, [user, API_URL]);
 

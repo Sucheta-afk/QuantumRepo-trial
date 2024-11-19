@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { File } from '@/lib/types';
-import { FaFile, FaFolder, FaJs, FaCss3Alt, FaHtml5, FaPython, FaReact, FaFolderOpen  } from 'react-icons/fa';
+import { FaFile, FaFolder, FaJs, FaCss3Alt, FaHtml5, FaPython, FaReact, FaFolderOpen } from 'react-icons/fa';
 
 interface FileManagerProps {
   repoName: string;
@@ -21,16 +21,16 @@ const FileManager: React.FC<FileManagerProps> = ({ repoName, files, onFileSelect
     setIsFolderOpen((prev) => ({ ...prev, [folderName]: !prev[folderName] }));
   };
 
-  const groupedFiles = files.reduce<{ [key: string]: File[] }>((acc, file) => {
+  const groupedFiles = (Array.isArray(files) ? files : []).reduce<{ [key: string]: File[] }>((acc, file) => {
     const parts = file.name.split('/');
     const folder = parts.length > 1 ? parts[0] : 'root';
     const fileName = parts.slice(1).join('/') || parts[0];
-
+  
     if (!acc[folder]) {
       acc[folder] = [];
     }
     acc[folder].push({ name: fileName, content: file.content });
-
+  
     return acc;
   }, {});
 

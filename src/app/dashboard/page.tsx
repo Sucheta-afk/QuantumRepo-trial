@@ -10,6 +10,7 @@ import useCheckAuth from "@/utils/checkAuth";
 interface UserData {
   username: string;
   email: string;
+  avatarUrl?: string;
   repositories?: { name: string }[];
   activity?: { description: string }[];
 }
@@ -136,12 +137,16 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold">Your Data</h2>
               <p className="text-gray-400">Username: {userData.username}</p>
               <p className="text-gray-400">Email: {userData.email}</p>
-              <p className="text-gray-400">
-                Repositories: {userData.repositories?.length}
-              </p>
-              <p className="text-gray-400">
-                Activity: {userData.activity?.length}
-              </p>
+              {userData.repositories && (
+                <p className="text-gray-400">
+                  Repositories: {userData.repositories.length}
+                </p>
+              )}
+              {userData.activity && (
+                <p className="text-gray-400">
+                  Activity: {userData.activity.length}
+                </p>
+              )}
             </div>
           )}
         </main>

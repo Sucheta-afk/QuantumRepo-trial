@@ -33,8 +33,6 @@ type Repository = {
   files: File[];
 };
 
-const API_URL = typeof window !== "undefined" ? window.location.origin : "";
-
 export default function RepositoryDetails() {
   const params = useParams();
   const repoName = params.repoName;
@@ -56,16 +54,28 @@ export default function RepositoryDetails() {
   };
 
   const handleDeleteRepo = async () => {
+    if (!user || !repoName) return;
+
     try {
       setDeleting(true);
-      await axios.delete(`${API_URL}/api/user/${user.uid}/repo/${repoName}`);
+      await axios.delete(`/api/repo?firebaseUid=${user.uid}&repoName=${repoName}`);
       router.push("/dashboard");
     } catch (error) {
       console.error("Error deleting repository:", error);
+      alert("Failed to delete the repository. Please try again later.");
     } finally {
       setDeleting(false);
       setIsModalOpen(false);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   useEffect(() => {
@@ -77,7 +87,7 @@ export default function RepositoryDetails() {
 
       try {
         const response = await axios.get(
-          `${API_URL}/api/user/${user.uid}/repo/${repoName}`
+          `/api/repo?firebaseUid=${user.uid}&repoName=${repoName}`
         );
         setRepo(response.data);
       } catch (error) {
@@ -125,7 +135,7 @@ export default function RepositoryDetails() {
                     {repo.language}
                   </span>
                   <span className="text-sm text-gray-500">
-                    Updated {repo.updatedAt}
+                    Updated {formatDate(repo.updatedAt)}
                   </span>
                 </div>
               </div>
@@ -174,12 +184,12 @@ export default function RepositoryDetails() {
           <div className="mt-8">
             <h2 className="text-2xl font-semibold text-blue-400 mb-4">Files</h2>
             <div className="space-y-4">
-              {repo.files.length === 0 ? (
+              {repo.files?.length === 0 ? (
                 <p className="text-gray-400">
                   No files found in this repository.
                 </p>
               ) : (
-                repo.files.map((file) => (
+                repo.files?.map((file) => (
                   <div
                     key={file._id}
                     className="bg-gray-800 p-4 rounded-lg shadow-md"
