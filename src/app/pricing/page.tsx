@@ -49,7 +49,7 @@ const PricingPage = () => {
             Pricing Plans
           </h1>
           <p className="text-lg md:text-xl text-gray-300 max-w-3xl mb-12">
-            Choose a plan that fits your needs and scale your projects with ease. Whether you're a solo developer or part of a team, we have the perfect plan for you.
+            Choose a plan that fits your needs and scale your projects with ease. Whether you&apos;re a solo developer or part of a team, we have the perfect plan for you.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4 md:px-12">
             {/* Pricing Cards */}
