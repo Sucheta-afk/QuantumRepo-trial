@@ -52,8 +52,11 @@ const Header = () => {
           </h1>
         </div>
 
-        {/* Desktop Navigation */}
+{/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6">
+          <Link href="/home" className="text-white hover:text-gray-300">
+            Home
+          </Link>
           <Link href="/features" className="text-white hover:text-gray-300">
             Features
           </Link>
@@ -63,9 +66,10 @@ const Header = () => {
           <Link href="/pricing" className="text-white hover:text-gray-300">
             Pricing
           </Link>
+          
         </nav>
 
-        {/* Mobile Menu Button */}
+{/* Mobile Menu Button */}
         <button
           onClick={toggleMenu}
           className="md:hidden text-white focus:outline-none"
@@ -113,6 +117,13 @@ const Header = () => {
       {menuOpen && (
         <div className="md:hidden bg-gray-800 shadow-md">
           <nav className="flex flex-col items-center space-y-4 py-4">
+           <Link
+              href="/features"
+              className="text-white hover:text-gray-300 w-full px-4 py-2 text-center"
+              onClick={toggleMenu}
+            >
+              Home
+            </Link>
             <Link
               href="/features"
               className="text-white hover:text-gray-300 w-full px-4 py-2 text-center"
