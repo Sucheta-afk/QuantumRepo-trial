@@ -9,9 +9,6 @@ import Footer from "@/components/home/Footer";
 import Image from "next/image";
 
 const HomePage = () => {
-  const [activeSection, setActiveSection] = useState<number>(0);
-
-  // Refs to track the visibility of sections
   const heroRef = useRef(null);
   const featuresRef = useRef(null);
   const statsRef = useRef(null);
@@ -21,20 +18,21 @@ const HomePage = () => {
   const [isStatsVisible, setStatsVisible] = useState(false);
 
   useEffect(() => {
-    // Intersection Observer for each section
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.target.id === "hero") {
-          setHeroVisible(entry.isIntersecting);
-        } else if (entry.target.id === "features") {
-          setFeaturesVisible(entry.isIntersecting);
-        } else if (entry.target.id === "stats") {
-          setStatsVisible(entry.isIntersecting);
-        }
-      });
-    }, { threshold: 0.5 });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target.id === "hero") {
+            setHeroVisible(entry.isIntersecting);
+          } else if (entry.target.id === "features") {
+            setFeaturesVisible(entry.isIntersecting);
+          } else if (entry.target.id === "stats") {
+            setStatsVisible(entry.isIntersecting);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
 
-    // Observe each section
     if (heroRef.current) observer.observe(heroRef.current);
     if (featuresRef.current) observer.observe(featuresRef.current);
     if (statsRef.current) observer.observe(statsRef.current);
@@ -50,7 +48,7 @@ const HomePage = () => {
           src="/assets/galaxy-background.jpg"
           alt="Hero Background"
           fill
-          style={{ objectFit: 'cover' }}
+          style={{ objectFit: "cover" }}
           className="opacity-50"
         />
       </div>
@@ -59,25 +57,37 @@ const HomePage = () => {
       <div className="relative z-50">
         <Header />
       </div>
-      <main className="relative z-10 pt-16"> {/* Added padding to account for fixed header */}
+      <main className="relative z-10 pt-16">
         <div
           id="hero"
           ref={heroRef}
-          className={`h-screen flex items-center justify-center text-center transition-all duration-700 transform ${isHeroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          className={`h-screen flex items-center justify-center text-center transition-all duration-700 transform ${
+            isHeroVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-10"
+          }`}
         >
           <HeroSection />
         </div>
         <div
           id="features"
           ref={featuresRef}
-          className={`h-screen flex items-center justify-center text-center transition-all duration-700 transform ${isFeaturesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          className={`h-screen flex items-center justify-center text-center transition-all duration-700 transform ${
+            isFeaturesVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-10"
+          }`}
         >
           <FeaturesSection />
         </div>
         <div
           id="stats"
           ref={statsRef}
-          className={`h-screen flex items-center justify-center text-center transition-all duration-700 transform ${isStatsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+          className={`h-screen flex items-center justify-center text-center transition-all duration-700 transform ${
+            isStatsVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-10"
+          }`}
         >
           <StatsSection />
         </div>

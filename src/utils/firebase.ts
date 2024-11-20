@@ -1,16 +1,6 @@
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
 
-// Define the type for the Firebase configuration object
-interface FirebaseConfig {
-  apiKey: string | undefined;
-  authDomain: string | undefined;
-  projectId: string | undefined;
-  storageBucket: string | undefined;
-  messagingSenderId: string | undefined;
-  appId: string | undefined;
-}
-
 // Firebase configuration from environment variables
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,

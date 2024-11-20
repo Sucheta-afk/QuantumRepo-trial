@@ -6,11 +6,29 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import useCheckAuth from "@/utils/checkAuth";
 
-export default function Dashboard() {
-  const API_URL = typeof window !== "undefined" ? window.location.origin : "";
+// Define the type for userData
+interface UserData {
+  username: string;
+  email: string;
+  avatarUrl?: string;
+  repositories?: { name: string }[];
+  activity?: { description: string }[];
+}
 
+// Helper type to handle errors
+interface CustomError extends Error {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
+const API_URL = typeof window !== "undefined" ? window.location.origin : "";
+
+export default function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const { user, isAuthenticated, loading } = useCheckAuth();
 
   const handleSidebarToggle = () => {
@@ -21,10 +39,14 @@ export default function Dashboard() {
     const fetchUserData = async () => {
       if (user) {
         try {
-          const response = await axios.get(`${API_URL}/api/user?firebaseUid=${user.uid}`);
+          const response = await axios.get(
+            `${API_URL}/api/user?firebaseUid=${user.uid}`
+          );
           setUserData(response.data);
         } catch (error) {
+          const typedError = error as CustomError;
           console.error("Error fetching user data:", error);
+          throw new Error(typedError.message || "Error fetching user data");
         }
       }
     };
@@ -37,7 +59,7 @@ export default function Dashboard() {
   }
 
   if (!isAuthenticated) {
-    return null; 
+    return null;
   }
 
   return (
@@ -60,7 +82,9 @@ export default function Dashboard() {
             isSidebarOpen ? "md:pl-16" : "md:pl-10"
           }`}
         >
-          <h1 className="text-3xl font-semibold mb-6">Welcome to your Dashboard</h1>
+          <h1 className="text-3xl font-semibold mb-6">
+            Welcome to your Dashboard
+          </h1>
 
           {/* Dashboard Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -70,8 +94,12 @@ export default function Dashboard() {
                 <h2 className="text-xl font-bold">Overview</h2>
                 <span className="text-green-500 text-4xl">📊</span>
               </div>
-              <p className="text-gray-400">View insights and summaries of your activity.</p>
-              <button className="mt-4 text-blue-500 hover:text-blue-400">See More</button>
+              <p className="text-gray-400">
+                View insights and summaries of your activity.
+              </p>
+              <button className="mt-4 text-blue-500 hover:text-blue-400">
+                See More
+              </button>
             </div>
 
             {/* Recent Activity Card */}
@@ -80,8 +108,12 @@ export default function Dashboard() {
                 <h2 className="text-xl font-bold">Recent Activity</h2>
                 <span className="text-yellow-500 text-4xl">📝</span>
               </div>
-              <p className="text-gray-400">Track your recent contributions and actions.</p>
-              <button className="mt-4 text-blue-500 hover:text-blue-400">View Activity</button>
+              <p className="text-gray-400">
+                Track your recent contributions and actions.
+              </p>
+              <button className="mt-4 text-blue-500 hover:text-blue-400">
+                View Activity
+              </button>
             </div>
 
             {/* Repositories Card */}
@@ -90,8 +122,12 @@ export default function Dashboard() {
                 <h2 className="text-xl font-bold">Your Repositories</h2>
                 <span className="text-purple-500 text-4xl">🔧</span>
               </div>
-              <p className="text-gray-400">Manage and view your repositories easily.</p>
-              <button className="mt-4 text-blue-500 hover:text-blue-400">Manage Repos</button>
+              <p className="text-gray-400">
+                Manage and view your repositories easily.
+              </p>
+              <button className="mt-4 text-blue-500 hover:text-blue-400">
+                Manage Repos
+              </button>
             </div>
           </div>
 
@@ -101,8 +137,16 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold">Your Data</h2>
               <p className="text-gray-400">Username: {userData.username}</p>
               <p className="text-gray-400">Email: {userData.email}</p>
-              <p className="text-gray-400">Repositories: {userData.repositories?.length}</p>
-              <p className="text-gray-400">Activity: {userData.activity?.length}</p>
+              {userData.repositories && (
+                <p className="text-gray-400">
+                  Repositories: {userData.repositories.length}
+                </p>
+              )}
+              {userData.activity && (
+                <p className="text-gray-400">
+                  Activity: {userData.activity.length}
+                </p>
+              )}
             </div>
           )}
         </main>

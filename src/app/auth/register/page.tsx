@@ -4,32 +4,76 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
 import Footer from "@/components/auth/Footer";
-import { googleLogin, githubLogin } from "@/app/api/auth/route";
 import { useRouter } from "next/navigation";
 import { FaGoogle, FaGithub } from "react-icons/fa";
+import axios from "axios";
+import {
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup,
+  UserCredential,
+} from "firebase/auth";
+import { auth } from "@/utils/firebase";
+
+const googleLogin = async (): Promise<void> => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const result: UserCredential = await signInWithPopup(auth, provider);
+    const token = await result.user.getIdToken();
+
+    const response = await axios.post(
+      `/api/auth`, // Backend API route
+      { token, provider: "google" }, // Send token and provider type
+      { withCredentials: true } // Include cookies if needed
+    );
+
+    console.log("Google Login Successful:", response.data);
+  } catch (error) {
+    console.error("Google Login failed:", error);
+    alert("Failed to log in with Google. Please try again.");
+    throw error;
+  }
+};
+
+// Function to handle GitHub login
+const githubLogin = async (): Promise<void> => {
+  try {
+    const provider = new GithubAuthProvider();
+    const result: UserCredential = await signInWithPopup(auth, provider);
+    const token = await result.user.getIdToken();
+
+    const response = await axios.post(
+      `/api/auth`, // Backend API route
+      { token, provider: "github" },
+      { withCredentials: true }
+    );
+
+    console.log("GitHub Login Successful:", response.data);
+  } catch (error) {
+    console.error("GitHub Login failed:", error);
+    alert("Failed to log in with GitHub. Please try again.");
+    throw error;
+  }
+};
 
 const CreateAccount: React.FC = () => {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  // Handle Google Sign-In
   const handleGoogleSignIn = async () => {
     try {
-      const data = await googleLogin();
-      router.push("/");
-    } catch (error) {
-      console.error("An error occurred during Google Sign-In:", error);
+      await googleLogin();
+      router.push("/"); // Redirect to home or dashboard
+    } catch {
       setError("An error occurred during Google Sign-In. Please try again.");
     }
   };
 
-  // Handle GitHub Sign-In
   const handleGitHubSignIn = async () => {
     try {
-      const data = await githubLogin();
-      router.push("/");
-    } catch (error) {
-      console.error("An error occurred during GitHub Sign-In:", error);
+      await githubLogin();
+      router.push("/"); // Redirect to home or dashboard
+    } catch {
       setError("An error occurred during GitHub Sign-In. Please try again.");
     }
   };
@@ -78,9 +122,8 @@ const CreateAccount: React.FC = () => {
         {/* Footer Links */}
         <div className="footer-links mt-4 text-center text-sm">
           <p>
-            Already have an account?
+            Already have an account?{" "}
             <Link href="/auth/login" className="text-blue-500 hover:underline">
-              {" "}
               Sign in
             </Link>
             .

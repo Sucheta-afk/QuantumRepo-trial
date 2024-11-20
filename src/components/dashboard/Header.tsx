@@ -18,22 +18,21 @@ export default function Header() {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
-  const { user, isAuthenticated } = useCheckAuth(); // Using custom hook for auth
+  const { user, isAuthenticated } = useCheckAuth();
 
   // Fetch profile image
   useEffect(() => {
     const fetchProfileImage = async () => {
-      if (user) {
-        try {
-          const response = await axios.get(`${API_URL}/api/user/profile-img?firebaseUid=${user.uid}`);
-          setProfileImage(response.data.avatarUrl);
-        } catch (error) {
-          console.error("Error fetching profile image:", error);
-        }
+      if (user.uid == null) return;
+      try {
+        const response = await axios.get(`${API_URL}/api/user/profile-img?firebaseUid=${user.uid}`);
+        setProfileImage(response.data.avatarUrl);
+      } catch (error) {
+        console.error("Error fetching profile image:", error);
       }
     };
-
-    fetchProfileImage();
+  
+    if (user) fetchProfileImage();
   }, [user, API_URL]);
 
   // Toggle profile dropdown
@@ -46,6 +45,10 @@ export default function Header() {
     auth.signOut().then(() => {
       router.push("/")
     });
+  };
+
+  const profile = () => {
+      router.push("/dashboard/settings");
   };
 
   // Toggle search bar on mobile
@@ -69,7 +72,7 @@ export default function Header() {
   }, []);
 
   if (!isAuthenticated) {
-    return null; // Ensure header doesn't render if the user isn't authenticated
+    return null;
   }
 
   return (
@@ -126,7 +129,7 @@ export default function Header() {
           >
             <button
               className="w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-600 rounded-t-md"
-              onClick={() => console.log("Profile clicked")}
+              onClick={profile}
             >
               Profile
             </button>

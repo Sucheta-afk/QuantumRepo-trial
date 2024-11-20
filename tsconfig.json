@@ -21,6 +21,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "server/utils/firebase.js", "src/app/api"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "server/utils/firebase.js", "src/app/api", "src/models/**/8.ts", "src/models/Activity.js", "src/models/User.js", "src/models/File.js", "src/models/Repo.js"],
   "exclude": ["node_modules"]
 }
